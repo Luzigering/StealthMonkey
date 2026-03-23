@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        :root {
+            --bg-base: #11111b;
+            --text-main: #cdd6f4;
+            --text-muted: #a6adc8;
+            --accent: #89b4fa;
+            --accent-hover: #b4befe;
+            --success: #a6e3a1;
+            --glass-bg: rgba(30, 30, 46, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-blur: blur(12px);
+        }
+
+        body { 
+            width: 320px; 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            margin: 0; 
+            background: var(--bg-base); 
+            color: var(--text-main); 
+            position: relative;
+            overflow: hidden; 
+        }
+
+        body::before {
+            content: ''; position: absolute; top: -30px; left: -30px; width: 120px; height: 120px;
+            background: rgba(137, 180, 250, 0.4); border-radius: 50%; filter: blur(40px); z-index: -1;
+        }
+        body::after {
+            content: ''; position: absolute; bottom: -20px; right: -20px; width: 100px; height: 100px;
+            background: rgba(166, 227, 161, 0.3); border-radius: 50%; filter: blur(40px); z-index: -1;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(137, 180, 250, 0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(137, 180, 250, 0.6); }
+
+        .header { 
+            background: var(--glass-bg); 
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            padding: 15px; text-align: center; font-weight: bold; font-size: 16px; 
+            border-bottom: 1px solid var(--glass-border); 
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .list { max-height: 250px; overflow-y: auto; padding: 12px; }
+        
+        .script-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 12px; 
+            background: rgba(49, 50, 68, 0.4); 
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid var(--glass-border);
+            margin-bottom: 8px; border-radius: 10px; 
+            transition: transform 0.2s, background 0.2s;
+        }
+        .script-item:hover {
+            background: rgba(49, 50, 68, 0.6);
+            transform: translateY(-1px);
+        }
+
+        .script-info { display: flex; flex-direction: column; overflow: hidden; margin-right: 10px; }
+        .script-name { font-size: 14px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .script-author { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+        .empty-msg { text-align: center; color: var(--text-muted); font-size: 13px; padding: 20px 0; }
+        
+        .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0;}
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); transition: .3s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: var(--text-muted); transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: rgba(166, 227, 161, 0.2); border-color: var(--success); }
+        input:checked + .slider:before { transform: translateX(16px); background-color: var(--success); box-shadow: 0 0 5px var(--success); }
+        
+        .footer { 
+            padding: 12px; 
+            background: var(--glass-bg); 
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-top: 1px solid var(--glass-border); 
+        }
+
+        .btn-dash { 
+            width: 100%; padding: 10px; 
+            background: linear-gradient(135deg, var(--accent), #74c7ec); 
+            color: #11111b; border: none; border-radius: 8px; cursor: pointer; 
+            font-weight: bold; transition: all 0.2s; margin-bottom: 12px;
+            box-shadow: 0 4px 10px rgba(137, 180, 250, 0.2);
+        }
+        .btn-dash:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(137, 180, 250, 0.4); }
+        
+        .gering-footer { 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 10px; color: var(--text-muted); 
+            gap: 6px; text-align: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            padding: 8px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .gering-footer a { color: var(--accent); text-decoration: none; font-weight: bold; transition: 0.2s; }
+        .gering-footer a:hover { color: var(--accent-hover); text-shadow: 0 0 5px rgba(137,180,250,0.5); }
+        .gering-icon { width: 14px; height: 14px; flex-shrink: 0; filter: drop-shadow(0 0 2px rgba(255,255,255,0.2)); }
+    </style>
+</head>
+<body>
+    <div class="header">🎭 StealthMonkey Pro</div>
+    <div class="list" id="scriptsList">
+        <div class="script-item">
+            <div class="script-info">
+                <span class="script-name">Bypass Ads Premium</span>
+                <span class="script-author">por Gering</span>
+            </div>
+            <label class="switch">
+                <input type="checkbox" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="script-item">
+            <div class="script-info">
+                <span class="script-name">Auto-Scroll Leitura</span>
+                <span class="script-author">por Gering</span>
+            </div>
+            <label class="switch">
+                <input type="checkbox">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+    <div class="footer">
+        <button class="btn-dash" id="btnDash">⚙️ Abrir Dashboard</button>
+        <div class="gering-footer">
+            <img src="icon.png" class="gering-icon" alt="Gering Icon" />
+            <span>by <a href="https://portfolio-fullstack-liart.vercel.app/" target="_blank">Gering</a> • tech & ops</span>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>
