@@ -16,11 +16,11 @@ await window.puppeteer_simulator_api.digitarFisico(input, "teste@email.com");
 E conforme mencionado acima, o bloco de função mais próximo do comando deve ser definido como assíncrono;
 
 # English
-Inspired by the userscript manager Tampermonkey and others in this segment, I created this browser extension that initiates debugging on the browser page as soon as it identifies the existence of userscripts, so that isTrusted is always true.
+inspired by the userscript manager tampermonkey and others in this segment, i created this browser extension that initiates debugging on the browser page as soon as it identifies the existence of userscripts, so that istrusted is always true.
 
-But this is not just a new version of something that already exists. I identified that most references in the segment had no means of guaranteeing that the code would be highly undetectable by the automation's target system, failing in this sense for automations carried out by Puppeteer. By using the native Chrome Debugger API, we have the guarantee that during the injection of commands, events such as clicks—which are primal for automations—always operate with the "isTrusted=true" flag, thus making the scripts undetectable. Even so, this system is in the BETA phase, and I may later include improvements in the dash, such as the inclusion of tutorial posts on the use of Jitters (randomization based on Math.random to adjust click and typing delay).
+but this is not just a new version of something that already exists. i identified that most references in the segment had no means of guaranteeing that the code would be highly undetectable by the automation's target system, failing in this sense for automations carried out by puppeteer. by using the native chrome debugger api, we have the guarantee that during the injection of commands, events such as clicks—which are primal for automations—always operate with the "istrusted=true" flag, thus making the scripts undetectable. even so, this system is in the beta phase, and i may later include improvements in the dash, such as the inclusion of tutorial posts on the use of jitters (randomization based on math.random to adjust click and typing delay).
 
-I implemented a transpiler to convert traditional JS codes, usually following a pattern with function synchronicity, and included a logic that adapts the code for the stealth system, which depends on the asynchronicity of functions, since the debugging and ChromeDebugger calls already occur synchronously. Even with the transpiler, to have greater efficiency, I recommend that you understand the system logic and always make manual adjustments; for this, follows the governing logic of the transpiler:
+i implemented a transpiler to convert traditional js codes, usually following a pattern with function synchronicity, and included a logic that adapts the code for the stealth system, which depends on the asynchronicity of functions, since the debugging and chromedebugger calls already occur synchronously. even with the transpiler, to have greater efficiency, i recommend that you understand the system logic and always make manual adjustments; for this, follows the governing logic of the transpiler:
 
 const botao = document.querySelector('#botao-1');
 botao.click(); is replaced by: await window.puppeteer_simulator_api.clickUpdt(botao);
@@ -29,4 +29,4 @@ const input = document.querySelector('#email');
 input.value = "teste@email.com";
 await window.puppeteer_simulator_api.digitarFisico(input, "teste@email.com");
 
-And as mentioned above, the function block closest to the command must be defined as asynchronous.
+and as mentioned above, the function block closest to the command must be defined as asynchronous.
