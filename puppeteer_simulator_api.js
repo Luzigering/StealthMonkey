@@ -23,12 +23,11 @@ window.puppeteer_simulator_api = {
         return new Promise(resolve => setTimeout(resolve, ms));
     },
     
-    // Função nova: Pergunta pro banco de dados se a chavinha está ligada
     async taLigado(botId) {
         return new Promise(resolve => {
             chrome.storage.local.get(['statusBots'], (result) => {
                 const status = result.statusBots || {};
-                resolve(status[botId] !== false); // Se não existir, o padrão é ligado (true)
+                resolve(status[botId] !== false); 
             });
         });
     }

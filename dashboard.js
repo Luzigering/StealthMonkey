@@ -5,19 +5,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const findInput = document.getElementById('findInput');
     const replaceInput = document.getElementById('replaceInput');
     const matchCounter = document.getElementById('matchCounter');
+    const listaScripts = document.getElementById('listaScripts');
 
     let scriptsSalvos = [];
     let idEditandoAgora = -1;
     let matches = [];
     let currentMatchIndex = -1;
 
+    const templatePadrao = `// ==UserScript==\n// @name  New Script\n// @version  1.0\n// @description  Userscript of user \n// @author User \n// @match  New Script\n// @grant none \n// ==/UserScript==\n\n`;
+
     function applySyntax(text) {
         let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+        const comments = [];
+        html = html.replace(/(\/\/.*|\/\*[\s\S]*?\*\/)/g, (m) => {
+            comments.push(m);
+            return `__CMT${comments.length - 1}__`;
+        });
+
+        const strings = [];
+        html = html.replace(/('.*?'|".*?"|`[\s\S]*?`|&quot;.*?&quot;)/g, (m) => {
+            strings.push(m);
+            return `__STR${strings.length - 1}__`;
+        });
+
         html = html.replace(/\b(const|let|var|function|return|if|else|for|while|async|await|class|new|try|catch)\b/g, '<span class="kwd">$1</span>');
         html = html.replace(/\b([a-zA-Z0-9_]+)(?=\()/g, '<span class="fnc">$1</span>');
-        html = html.replace(/('.*?'|".*?"|`[\s\S]*?`|&quot;.*?&quot;)/g, '<span class="str">$1</span>');
         html = html.replace(/\b(\d+)\b/g, '<span class="num">$1</span>');
-        html = html.replace(/(\/\/.*|\/\*[\s\S]*?\*\/)/g, '<span class="cmt">$1</span>');
+
+        strings.forEach((s, i) => {
+            html = html.replace(`__STR${i}__`, `<span class="str">${s}</span>`);
+        });
+        comments.forEach((c, i) => {
+            html = html.replace(`__CMT${i}__`, `<span class="cmt">${c}</span>`);
+        });
+
         return html;
     }
 
@@ -55,16 +77,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function selectLine(lineIdx) {
         const lines = textarea.value.split('\n');
         let startPos = 0;
-        for (let i = 0; i < lineIdx; i++) {
-            startPos += lines[i].length + 1;
-        }
+        for (let i = 0; i < lineIdx; i++) { startPos += lines[i].length + 1; }
         const endPos = startPos + lines[lineIdx].length;
         
         textarea.focus();
         textarea.setSelectionRange(startPos, endPos);
-        
-        const lineHeight = 22;
-        textarea.scrollTop = (lineIdx * lineHeight) - (textarea.clientHeight / 2);
+        textarea.scrollTop = (lineIdx * 22) - (textarea.clientHeight / 2);
     }
 
     function findNext() {
@@ -85,8 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             textarea.setSelectionRange(pos, pos + term.length);
 
             const lineNumber = text.substring(0, pos).split('\n').length - 1;
-            const lineHeight = 22;
-            textarea.scrollTop = (lineNumber * lineHeight) - (textarea.clientHeight / 2);
+            textarea.scrollTop = (lineNumber * 22) - (textarea.clientHeight / 2);
             
             matchCounter.textContent = `${currentMatchIndex + 1}/${matches.length}`;
         }
@@ -117,9 +134,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btnSalvar').onclick = () => {
         const codigo = textarea.value;
-        const meta = codigo.match(/@name\s+(.+)/);
-        const name = meta ? meta[1].trim() : "Untitled Script";
-        const obj = { name, codigo, match: "<all_urls>", ativo: true };
+        
+        const nameMatch = codigo.match(/@name\s+(.+)/);
+        const name = nameMatch ? nameMatch[1].trim() : "Untitled Script";
+        
+        const urlMatch = codigo.match(/@match\s+(.+)/);
+        const match = urlMatch ? urlMatch[1].trim() : "";
+        
+        if (!match || match === "New Script" || match === "https://exemplo.com.br/*") {
+            alert("Defina o site alvo válido na tag @match antes de salvar! (Substitua o 'New Script')");
+            return; 
+        }
+        
+        const authorMatch = codigo.match(/@author\s+(.+)/);
+        const author = authorMatch ? authorMatch[1].trim() : "User";
+
+        let ativo = true;
+        if (idEditandoAgora !== -1 && scriptsSalvos[idEditandoAgora]) {
+            ativo = scriptsSalvos[idEditandoAgora].ativo !== false;
+        }
+
+        const obj = { name, codigo, match, author, ativo };
 
         if (idEditandoAgora === -1) {
             scriptsSalvos.push(obj);
@@ -138,13 +173,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btnNovo').onclick = () => {
         idEditandoAgora = -1;
-        textarea.value = "// ==UserScript==\n// @name  New Script\n// @version  1.0\n// @description  Userscript of user \n// @author User \n// @match  New Script\n// @grant none \n//==/UserScript==\n\n";
+        textarea.value = templatePadrao;
         textarea.focus();
         renderLista();
         syncEditor();
     };
 
-    // Eventos de Teclado e Scroll
+    textarea.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const start = textarea.selectionStart;
+            textarea.value = textarea.value.substring(0, start) + "    " + textarea.value.substring(textarea.selectionEnd);
+            textarea.selectionStart = textarea.selectionEnd = start + 4;
+            syncEditor();
+        }
+    });
+
     textarea.addEventListener('input', syncEditor);
     textarea.addEventListener('scroll', syncEditor);
     findInput.addEventListener('input', () => { currentMatchIndex = -1; findNext(); });

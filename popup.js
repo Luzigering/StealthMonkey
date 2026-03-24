@@ -10,17 +10,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         let encontrouAlgo = false;
 
         scripts.forEach((script, index) => {
-            let regexString = script.match.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
+            let matchFormatado = script.match ? script.match.trim() : '*://*/*';
+            if (matchFormatado === '<all_urls>') matchFormatado = '*://*/*';
+            
+            let regexString = matchFormatado.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
             const matchRegex = new RegExp('^' + regexString);
 
-            if (matchRegex.test(urlAtual) || script.match === '<all_urls>') {
+            if (matchRegex.test(urlAtual)) {
                 encontrouAlgo = true;
                 const div = document.createElement('div');
                 div.className = 'script-item';
                 div.innerHTML = `
                     <div class="script-info">
                         <span class="script-name" title="${script.name}">${script.name}</span>
-                        <span class="script-author">por ${script.author}</span>
+                        <span class="script-author">por ${script.author || 'Lu'}</span>
                     </div>
                     <label class="switch">
                         <input type="checkbox" data-id="${index}" ${script.ativo !== false ? 'checked' : ''}>
@@ -32,16 +35,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         if (!encontrouAlgo) {
-            list.innerHTML = `<div class="empty-msg">Nenhum script para esta página.</div>`;
-        }
-
-        document.querySelectorAll('input[type="checkbox"]').forEach(toggle => {
-            toggle.addEventListener('change', (e) => {
-                const id = e.target.getAttribute('data-id');
-                scripts[id].ativo = e.target.checked;
-                chrome.storage.local.set({ 'stealthScriptsDB': scripts });
+            list.innerHTML = `
+                <div class="empty-msg">
+                    <span style="font-size: 24px; display: block; margin-bottom: 8px;">👻</span>
+                    Nenhum script configurado para esta página.
+                </div>
+            `;
+        } else {
+            document.querySelectorAll('input[type="checkbox"]').forEach(toggle => {
+                toggle.addEventListener('change', (e) => {
+                    const id = e.target.getAttribute('data-id');
+                    scripts[id].ativo = e.target.checked;
+                    chrome.storage.local.set({ 'stealthScriptsDB': scripts });
+                });
             });
-        });
+        }
     });
 
     document.getElementById('btnDash').onclick = () => {
