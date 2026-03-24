@@ -206,4 +206,35 @@ document.addEventListener('DOMContentLoaded', () => {
         scriptsSalvos = res.stealthScriptsDB || [];
         renderLista();
     });
+    document.getElementById('btnConverter').onclick = () => {
+        let code = textarea.value;
+
+        code = code.replace(/([a-zA-Z0-9_$.]+)\.click\(\)/g, "await window.puppeteer_simulator_api.clickUpdt($1)");
+
+        code = code.replace(/([a-zA-Z0-9_$.]+)\.value\s*=\s*([^;\n]+);?/g, "await window.puppeteer_simulator_api.digitarFisico($1, $2);");
+
+        code = code.replace(/setTimeout\(\s*(?:\(\)\s*=>\s*\{\}|\w+)\s*,\s*(\d+)\s*\);?/g, "await window.puppeteer_simulator_api.esperar($1);");
+
+        code = code.replace(/(?<!async\s+)function/g, "async function");
+        
+        code = code.replace(/(?<!async\s+)(\([^)]*\)\s*=>)/g, "async $1");
+
+        textarea.value = code;
+        syncEditor();
+        
+        const btn = document.getElementById('btnConverter');
+        const textoOriginal = btn.textContent;
+        btn.textContent = "✅ Código alterado!";
+        btn.style.background = "var(--success)";
+        setTimeout(() => {
+            btn.textContent = textoOriginal;
+            btn.style.background = "var(--accent)";
+        }, 2000);
+    };
+    window.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key.toLowerCase() === 's') {
+            e.preventDefault(); 
+            document.getElementById('btnSalvar').click(); 
+            }
+            });
 });
