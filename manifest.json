@@ -3,7 +3,7 @@
   "name": "StealthMonkey Pro",
   "version": "2.0",
   "description": "Gerenciador de scripts via Runtime Evaluation",
-  "permissions": ["debugger", "storage", "tabs"],
+  "permissions": ["debugger", "storage", "tabs", "scripting" ],
   "host_permissions": ["<all_urls>"],
   "icons": {
     "128": "icon.png"

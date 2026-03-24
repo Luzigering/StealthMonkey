@@ -191,7 +191,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     textarea.addEventListener('input', syncEditor);
     textarea.addEventListener('scroll', syncEditor);
-    findInput.addEventListener('input', () => { currentMatchIndex = -1; findNext(); });
+    findInput.addEventListener('input', () => { 
+        currentMatchIndex = -1; 
+        findNext(); 
+        
+        findInput.focus(); 
+    });
+    findInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            findNext();
+            findInput.focus(); 
+        }
+    });
     document.getElementById('btnNext').onclick = findNext;
     
     document.getElementById('btnReplace').onclick = () => {
