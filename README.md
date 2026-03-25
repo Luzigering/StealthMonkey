@@ -15,7 +15,11 @@ await window.puppeteer_simulator_api.digitarFisico(input, "teste@email.com");
 
 E conforme mencionado acima, o bloco de função mais próximo do comando deve ser definido como assíncrono;
 
-Em suma, podemos definir que os userscripts manager atuam limitados á camada de interface, enquanto meu projeto se propõe a ser uma ferramenta efetiva de emulação de software, pois os eventos são processados via CDP (Chrome Debugger Protocol), diretamente pelo motor C++, e os cliques são movidos baseados em coordenadas cartesianas.
+Em suma, podemos definir que os userscripts manager atuam limitados á camada de interface, enquanto meu projeto se propõe a ser uma ferramenta efetiva de emulação de software, pois os eventos são processados via CDP (Chrome Debugger Protocol), diretamente pelo motor C++, e os cliques são movidos baseados em coordenadas cartesianas adaptadas e uma função getBoundingClientRect() que localiza o ponto exato de clique usando lógica geométrica;
+
+Primeiros passos:
+Baixe o arquivo StealthMonkey-main.zip; 
+Após extração, carregue na aba de extensões do seu navegador como sem compactação.
 
 # English
 inspired by the userscript manager tampermonkey and others in this segment, i created this browser extension that initiates debugging on the browser page as soon as it identifies the existence of userscripts, so that istrusted is always true.
